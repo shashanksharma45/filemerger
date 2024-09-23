@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Report Merger</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="content-container">
+            <div class="file-content">
+                <div class="fist-file">
+                    <label for="avatar">Choose First File:</label>
+                    <input type="file" id="uploadFirstFile" accept=".xlsx, .xls" />
+                </div>
+                <div class="second-file">
+                    <label for="avatar">Choose Second File:</label>
+                    <input type="file" id="uploadSecondFile" accept=".xlsx, .xls" />
+                </div>
+                <Button class="preview-btn btn" onclick="previewData()">Merge & Preview Data</Button>
+                <Button class="merge-btn btn" id="download" onclick="downloadUpdatedFile()">Download</Button>
+            </div>
+            <div style="height: 65vh;">
+                <div id="previewContainer">
+                    <!-- Merged data will be shown here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+
+</html>
