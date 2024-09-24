@@ -34,20 +34,21 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const worksheet = workbook.Sheets[sheetName];
         let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         jsonData = jsonData.filter(row => row.some(cell => cell !== null && cell !== ''));
+        console.log(jsonData)
 
-        const bankAccountNumberHeader = 'bank_account_number';
-        const ifscCodeHeader = 'ifsc_code';
-        const upiVpaHeader = 'upi_vpa';
-        const acHolderNameHeader = 'ac_holder_name';
-        const mfilteritScreenshotHeader = 'mfilterit_screenshot_url';
-        const npciScreenshotHeader = 'npci_screenshot_url';
-        const websiteUrlHeader = 'website_url';
-        const paymentGatewayUrlHeader = 'payment_gateway_url';
-        const transactionMethodHeader = 'transaction_method';
+        // const bankAccountNumberHeader = 'bank_account_number';
+        // const ifscCodeHeader = 'ifsc_code';
+        const upiVpaHeader = 'UPI/VPA/Wallet';
+        const acHolderNameHeader = 'A/C Holder Name';
+        const mfilteritScreenshotHeader = 'MFilterit_Screenshots';
+        const npciScreenshotHeader = 'NPCI_Screenshots';
+        const websiteUrlHeader = 'Website URL';
+        const paymentGatewayUrlHeader = 'UPI URLs';
+        const transactionMethodHeader = 'Method';
 
         const headerRow = jsonData[0];
-        const bankAccountNumberIndex = headerRow.indexOf(bankAccountNumberHeader);
-        const ifscCodeIndex = headerRow.indexOf(ifscCodeHeader);
+        // const bankAccountNumberIndex = headerRow.indexOf(bankAccountNumberHeader);
+        // const ifscCodeIndex = headerRow.indexOf(ifscCodeHeader);
         const upiVpaIndex = headerRow.indexOf(upiVpaHeader);
         const acHolderNameIndex = headerRow.indexOf(acHolderNameHeader);
         const mfilteritSsIndex = headerRow.indexOf(mfilteritScreenshotHeader);
@@ -56,7 +57,7 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const paymentGatewayUrlIndex = headerRow.indexOf(paymentGatewayUrlHeader);
         const transactionMethodIndex = headerRow.indexOf(transactionMethodHeader);
 
-        if (upiVpaIndex === -1 || paymentGatewayUrlIndex === -1 || bankAccountNumberIndex === -1 || ifscCodeIndex === -1 || bankAccountNumberIndex === -1 || mfilteritSsIndex === -1 || npciSsIndex === -1 || websiteUrlIndex === -1 || transactionMethodIndex === -1) {
+        if (upiVpaIndex === -1 || paymentGatewayUrlIndex === -1 || mfilteritSsIndex === -1 || npciSsIndex === -1 || websiteUrlIndex === -1 || transactionMethodIndex === -1) {
             alert('The required columns "upi_vpa", "payment_gateway_url", "bank_account_number", "ifsc_code", "ac_holder_name", "mfilterit_screenshot_url", "npci_screenshot_url", "website_url" or "transaction_method"  are missing in the first file.');
             return;
         }
@@ -66,8 +67,8 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
                 return [upiVpaHeader, paymentGatewayUrlHeader, 'Handle', 'Domain'];
             }
 
-            const bankAccountNumberData = row[bankAccountNumberIndex];
-            const ifscCodeData = row[ifscCodeIndex];
+            // const bankAccountNumberData = row[bankAccountNumberIndex];
+            // const ifscCodeData = row[ifscCodeIndex];
             const upiVpaData = row[upiVpaIndex];
             const acHolderNameData = row[acHolderNameIndex];
             const paymentGatewayData = row[paymentGatewayUrlIndex];
@@ -113,12 +114,10 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
                     });
                 }
             }
-            console.log(insertDateData)
 
-            return [bankAccountNumberData, ifscCodeData, upiVpaData, acHolderNameData, websiteUrlData, paymentGatewayData, transactionMethodData, handle, domain, screenshotUrl.join(','), DateWithTime, insertDateData];
+            return [upiVpaData, acHolderNameData, websiteUrlData, paymentGatewayData, transactionMethodData, handle, domain, screenshotUrl.join(','), DateWithTime, insertDateData];
         });
     };
-
     reader.readAsArrayBuffer(file);
 });
 
