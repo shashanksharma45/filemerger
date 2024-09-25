@@ -34,7 +34,7 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const worksheet = workbook.Sheets[sheetName];
         let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         jsonData = jsonData.filter(row => row.some(cell => cell !== null && cell !== ''));
-        console.log(jsonData)
+        
 
         // const bankAccountNumberHeader = 'bank_account_number';
         // const ifscCodeHeader = 'ifsc_code';
@@ -114,9 +114,9 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
                     });
                 }
             }
-
             return [upiVpaData, acHolderNameData, websiteUrlData, paymentGatewayData, transactionMethodData, handle, domain, screenshotUrl.join(','), DateWithTime, insertDateData];
         });
+        console.log(extractedData)
     };
     reader.readAsArrayBuffer(file);
 });
@@ -145,8 +145,8 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         });
 
         const headers = secondFileData[0];
-        bankAccNumberColumnIndex = headers.indexOf('bank_account_number');
-        ifscCodeColumnIndex = headers.indexOf('ifsc_code');
+        // bankAccNumberColumnIndex = headers.indexOf('bank_account_number');
+        // ifscCodeColumnIndex = headers.indexOf('ifsc_code');
         upiVpaColumnIndex = headers.indexOf('upi_vpa');
         acHolderNameColumnIndex = headers.indexOf('ac_holder_name');
         screenshotUrlColumnIndex = headers.indexOf('screenshot');
@@ -182,24 +182,24 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         for (let i = 1; i < extractedData.length; i++) {
             if (secondFileData[i]) {
                 console.log(extractedData[i])
-                secondFileData[i][bankAccNumberColumnIndex] = extractedData[i][0];
-                secondFileData[i][ifscCodeColumnIndex] = extractedData[i][1];
-                secondFileData[i][upiVpaColumnIndex] = extractedData[i][2];
-                secondFileData[i][acHolderNameColumnIndex] = extractedData[i][3];
-                secondFileData[i][websiteUrlColumnIndex] = extractedData[i][4];
-                secondFileData[i][paymentGatewayUrlColumnIndex] = extractedData[i][5];
-                secondFileData[i][paymentGatewayIntermediateUrlColIndex] = extractedData[i][5];
-                secondFileData[i][upiUrlColumnIndex] = extractedData[i][5];
-                secondFileData[i][transactionMethodColumnIndex] = extractedData[i][6];
-                secondFileData[i][handleColumnIndex] = extractedData[i][7];
-                secondFileData[i][domainColumnIndex] = extractedData[i][8];
-                secondFileData[i][screenshotUrlColumnIndex] = extractedData[i][9];
-                secondFileData[i][screenshotUrlSecColumnIndex] = extractedData[i][9]
-                secondFileData[i][dateWithTime] = extractedData[i][10];
-                secondFileData[i][insertedDate] = extractedData[i][11];
+                // secondFileData[i][bankAccNumberColumnIndex] = extractedData[i][0];
+                // secondFileData[i][ifscCodeColumnIndex] = extractedData[i][1];
+                secondFileData[i][upiVpaColumnIndex] = extractedData[i][0];
+                secondFileData[i][acHolderNameColumnIndex] = extractedData[i][1];
+                secondFileData[i][websiteUrlColumnIndex] = extractedData[i][2];
+                secondFileData[i][paymentGatewayUrlColumnIndex] = extractedData[i][3];
+                secondFileData[i][paymentGatewayIntermediateUrlColIndex] = extractedData[i][3];
+                secondFileData[i][upiUrlColumnIndex] = extractedData[i][3];
+                secondFileData[i][transactionMethodColumnIndex] = extractedData[i][4];
+                secondFileData[i][handleColumnIndex] = extractedData[i][5];
+                secondFileData[i][domainColumnIndex] = extractedData[i][6];
+                secondFileData[i][screenshotUrlColumnIndex] = extractedData[i][7];
+                secondFileData[i][screenshotUrlSecColumnIndex] = extractedData[i][7]
+                secondFileData[i][dateWithTime] = extractedData[i][8];
+                secondFileData[i][insertedDate] = extractedData[i][9];
 
                 // Fetch the Bank Name from the map based on the Handle
-                const handle = extractedData[i][7].toLowerCase();
+                const handle = extractedData[i][5].toLowerCase();
                 if (handle && bankNameMap[handle]) {
                     secondFileData[i][bankNameColumnIndex] = bankNameMap[handle];
                 }
