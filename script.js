@@ -1,6 +1,8 @@
 let extractedData = [];
 let secondFileData = [];
 let bankNameMap = {};
+let originOfWebsite = {};
+let categoryOfWebsite = {};
 let upiVpaColumnIndex = -1;
 let paymentGatewayUrlColumnIndex = -1;
 let handleColumnIndex = -1;
@@ -19,7 +21,8 @@ let screenshotUrlSecColumnIndex = -1;
 let paymentGatewayIntermediateUrlColIndex = -1;
 let dateWithTime = -1;
 let insertedDate = -1;
-
+let originColumnIndex = -1;
+let categoryColumnIndex = -1;
 let upiUrlColumnIndex = -1;
 
 // Load the first file and extract UPI VPA, Payment Gateway URL, Handle, and Domain
@@ -34,10 +37,8 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const worksheet = workbook.Sheets[sheetName];
         let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         jsonData = jsonData.filter(row => row.some(cell => cell !== null && cell !== ''));
-        
+        // console.log(jsonData)
 
-        // const bankAccountNumberHeader = 'bank_account_number';
-        // const ifscCodeHeader = 'ifsc_code';
         const upiVpaHeader = 'UPI/VPA/Wallet';
         const acHolderNameHeader = 'A/C Holder Name';
         const mfilteritScreenshotHeader = 'MFilterit_Screenshots';
@@ -47,8 +48,6 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const transactionMethodHeader = 'Method';
 
         const headerRow = jsonData[0];
-        // const bankAccountNumberIndex = headerRow.indexOf(bankAccountNumberHeader);
-        // const ifscCodeIndex = headerRow.indexOf(ifscCodeHeader);
         const upiVpaIndex = headerRow.indexOf(upiVpaHeader);
         const acHolderNameIndex = headerRow.indexOf(acHolderNameHeader);
         const mfilteritSsIndex = headerRow.indexOf(mfilteritScreenshotHeader);
@@ -67,8 +66,6 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
                 return [upiVpaHeader, paymentGatewayUrlHeader, 'Handle', 'Domain'];
             }
 
-            // const bankAccountNumberData = row[bankAccountNumberIndex];
-            // const ifscCodeData = row[ifscCodeIndex];
             const upiVpaData = row[upiVpaIndex];
             const acHolderNameData = row[acHolderNameIndex];
             const paymentGatewayData = row[paymentGatewayUrlIndex];
@@ -116,7 +113,6 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
             }
             return [upiVpaData, acHolderNameData, websiteUrlData, paymentGatewayData, transactionMethodData, handle, domain, screenshotUrl.join(','), DateWithTime, insertDateData];
         });
-        console.log(extractedData)
     };
     reader.readAsArrayBuffer(file);
 });
@@ -138,15 +134,30 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         const sheet2 = workbook.Sheets[workbook.SheetNames[1]];
         const sheet2Data = XLSX.utils.sheet_to_json(sheet2, { header: 1 });
 
+        // Read the Third sheet and create a map of Handle to Bank Name
+        const sheet3 = workbook.Sheets[workbook.SheetNames[2]];
+        const sheet3Data = XLSX.utils.sheet_to_json(sheet3, { header: 1 });
+        // console.log(sheet3Data);
+
         sheet2Data.forEach(row => {
             if (row[0] && row[1]) {
                 bankNameMap[row[0].toLowerCase()] = row[1];
             }
         });
 
+        sheet3Data.forEach(row=>{
+            if(row[0] && row[1]){
+                originOfWebsite[row[0].toLowerCase()] = row[1];
+            }
+        })
+
+        sheet3Data.forEach(row=>{
+            if(row[0] && row[2]){
+                categoryOfWebsite[row[0].toLowerCase()] = row[2];
+            }
+        })
+
         const headers = secondFileData[0];
-        // bankAccNumberColumnIndex = headers.indexOf('bank_account_number');
-        // ifscCodeColumnIndex = headers.indexOf('ifsc_code');
         upiVpaColumnIndex = headers.indexOf('upi_vpa');
         acHolderNameColumnIndex = headers.indexOf('ac_holder_name');
         screenshotUrlColumnIndex = headers.indexOf('screenshot');
@@ -161,9 +172,10 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         paymentGatewayIntermediateUrlColIndex = headers.indexOf('payment_gateway_intermediate_url');
         dateWithTime = headers.indexOf('case_generated_time');
         insertedDate = headers.indexOf('inserted_date');
+        originColumnIndex = headers.indexOf('origin');
+        categoryColumnIndex = headers.indexOf('category_of_website');
 
-
-        if (upiVpaColumnIndex === -1 || paymentGatewayUrlColumnIndex === -1 || handleColumnIndex === -1 || domainColumnIndex === -1 || bankNameColumnIndex === -1 || bankAccNumberColumnIndex === -1 || ifscCodeColumnIndex === -1 || acHolderNameColumnIndex === -1 || screenshotUrlColumnIndex === -1 || screenshotUrlSecColumnIndex === -1 || transactionMethodColumnIndex === -1 || upiUrlColumnIndex === -1 || websiteUrlColumnIndex === -1 || paymentGatewayIntermediateUrlColIndex === -1, dateWithTime === -1, insertedDate === -1) {
+        if (upiVpaColumnIndex === -1 || paymentGatewayUrlColumnIndex === -1 || handleColumnIndex === -1 || domainColumnIndex === -1 || bankNameColumnIndex === -1 || bankAccNumberColumnIndex === -1 || ifscCodeColumnIndex === -1 || acHolderNameColumnIndex === -1 || screenshotUrlColumnIndex === -1 || screenshotUrlSecColumnIndex === -1 || transactionMethodColumnIndex === -1 || upiUrlColumnIndex === -1 || websiteUrlColumnIndex === -1 || paymentGatewayIntermediateUrlColIndex === -1, dateWithTime === -1, insertedDate === -1, originColumnIndex === -1, categoryColumnIndex === -1) {
             alert('The required columns "upi_vpa", "payment_gateway_url", "Handle", "Payment_gateway_name", or "Bank_name" are missing in the second file.');
             return;
         }
@@ -182,8 +194,6 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         for (let i = 1; i < extractedData.length; i++) {
             if (secondFileData[i]) {
                 console.log(extractedData[i])
-                // secondFileData[i][bankAccNumberColumnIndex] = extractedData[i][0];
-                // secondFileData[i][ifscCodeColumnIndex] = extractedData[i][1];
                 secondFileData[i][upiVpaColumnIndex] = extractedData[i][0];
                 secondFileData[i][acHolderNameColumnIndex] = extractedData[i][1];
                 secondFileData[i][websiteUrlColumnIndex] = extractedData[i][2];
@@ -203,12 +213,25 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
                 if (handle && bankNameMap[handle]) {
                     secondFileData[i][bankNameColumnIndex] = bankNameMap[handle];
                 }
+
+                // Fetch the Origin from the map based on the Website Url
+                const origin = extractedData[i][2].toLowerCase();
+                if(origin && originOfWebsite[origin]) {
+                    secondFileData[i][originColumnIndex] = originOfWebsite[origin];
+                }
+
+                // Fetch the Category from the map based on the Website Url
+                const category = extractedData[i][2].toLowerCase();
+                if(category && categoryOfWebsite[category]){
+                    secondFileData[i][categoryColumnIndex] = categoryOfWebsite[category];
+                }
             }
         }
     };
 
     reader.readAsArrayBuffer(file);
 });
+
 
 // Function to extract and convert the number from the URL to date
 function convertToDateTime(npciNumber) {
