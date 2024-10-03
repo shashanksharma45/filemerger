@@ -112,9 +112,8 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
                 }
             }
 
-            // Logic to determine UPI, BANK, or Wallet based on upiVpaData
-            let upiType = 'Wallet'; // Default to Wallet
-            const upiVpaDataString = String(upiVpaData); // Convert to string for consistent checks
+            let upiType = 'Wallet';
+            const upiVpaDataString = String(upiVpaData); 
 
             if (upiVpaDataString.includes('@')) {
                 upiType = 'UPI'; // If it contains '@', it's a UPI ID
