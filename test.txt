@@ -1,0 +1,109 @@
+// fetch('files/second_file.xlsx') // Replace with the correct path to the file
+//     .then(response => response.arrayBuffer())
+//     .then(data => {
+//         const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+//         // Read the first sheet
+//         const sheet1 = workbook.Sheets[workbook.SheetNames[0]];
+//         secondFileData = XLSX.utils.sheet_to_json(sheet1, { header: 1 });
+
+//         // Read the second sheet and create a map of Handle to Bank Name
+//         const sheet2 = workbook.Sheets[workbook.SheetNames[1]];
+//         const sheet2Data = XLSX.utils.sheet_to_json(sheet2, { header: 1 });
+
+//         // Read the Third sheet and create a map of Handle to Bank Name
+//         const sheet3 = workbook.Sheets[workbook.SheetNames[2]];
+//         const sheet3Data = XLSX.utils.sheet_to_json(sheet3, { header: 1 });
+
+//         sheet2Data.forEach(row => {
+//             if (row[0] && row[1]) {
+//                 bankNameMap[row[0].toLowerCase()] = row[1];
+//             }
+//         });
+
+//         sheet3Data.forEach(row => {
+//             if (row[0] && row[1]) {
+//                 originOfWebsite[row[0].toLowerCase()] = row[1];
+//             }
+//         })
+
+//         sheet3Data.forEach(row => {
+//             if (row[0] && row[2]) {
+//                 categoryOfWebsite[row[0].toLowerCase()] = row[2];
+//             }
+//         })
+
+//         const headers = secondFileData[0];
+//         upiVpaColumnIndex = headers.indexOf('upi_vpa');
+//         acHolderNameColumnIndex = headers.indexOf('ac_holder_name');
+//         screenshotUrlColumnIndex = headers.indexOf('screenshot');
+//         paymentGatewayUrlColumnIndex = headers.indexOf('payment_gateway_url');
+//         handleColumnIndex = headers.indexOf('handle');
+//         domainColumnIndex = headers.indexOf('payment_gateway_name');
+//         bankNameColumnIndex = headers.indexOf('bank_name');
+//         screenshotUrlSecColumnIndex = headers.indexOf('screenshot_case_report_link');
+//         transactionMethodColumnIndex = headers.indexOf('transaction_method');
+//         upiUrlColumnIndex = headers.indexOf('upi_url');
+//         websiteUrlColumnIndex = headers.indexOf('website_url');
+//         paymentGatewayIntermediateUrlColIndex = headers.indexOf('payment_gateway_intermediate_url');
+//         dateWithTime = headers.indexOf('case_generated_time');
+//         insertedDate = headers.indexOf('inserted_date');
+//         originColumnIndex = headers.indexOf('origin');
+//         categoryColumnIndex = headers.indexOf('category_of_website');
+
+//         if (upiVpaColumnIndex === -1 || paymentGatewayUrlColumnIndex === -1 || handleColumnIndex === -1 || domainColumnIndex === -1 || bankNameColumnIndex === -1 || bankAccNumberColumnIndex === -1 || ifscCodeColumnIndex === -1 || acHolderNameColumnIndex === -1 || screenshotUrlColumnIndex === -1 || screenshotUrlSecColumnIndex === -1 || transactionMethodColumnIndex === -1 || upiUrlColumnIndex === -1 || websiteUrlColumnIndex === -1 || paymentGatewayIntermediateUrlColIndex === -1, dateWithTime === -1, insertedDate === -1, originColumnIndex === -1, categoryColumnIndex === -1) {
+//             alert('The required columns "upi_vpa", "payment_gateway_url", "Handle", "Payment_gateway_name", or "Bank_name" are missing in the second file.');
+//             return;
+//         }
+
+//         const firstFileDataLength = extractedData.length - 1; // Minus 1 to exclude the header row
+
+//         // Remove existing rows from secondFileData beyond the first static row
+//         secondFileData = secondFileData.slice(0, 2);
+
+//         // Add only as many rows as there are in the first file
+//         for (let i = 1; i <= firstFileDataLength; i++) {
+//             const newRow = [...secondFileData[1]]; // Clone the second row (static template)
+//             secondFileData.push(newRow);
+//         }
+//         // Merge data from the first file into the second file's first sheet
+//         for (let i = 1; i < extractedData.length; i++) {
+//             if (secondFileData[i]) {
+//                 console.log(extractedData[i]);
+//                 secondFileData[i][upiVpaColumnIndex] = extractedData[i][0];
+//                 secondFileData[i][acHolderNameColumnIndex] = extractedData[i][1];
+//                 secondFileData[i][websiteUrlColumnIndex] = extractedData[i][2];
+//                 secondFileData[i][paymentGatewayUrlColumnIndex] = extractedData[i][3];
+//                 secondFileData[i][paymentGatewayIntermediateUrlColIndex] = extractedData[i][3];
+//                 secondFileData[i][upiUrlColumnIndex] = extractedData[i][3];
+//                 secondFileData[i][transactionMethodColumnIndex] = extractedData[i][4];
+//                 secondFileData[i][handleColumnIndex] = extractedData[i][5];
+//                 secondFileData[i][domainColumnIndex] = extractedData[i][6];
+//                 secondFileData[i][screenshotUrlColumnIndex] = extractedData[i][7];
+//                 secondFileData[i][screenshotUrlSecColumnIndex] = extractedData[i][7]
+//                 secondFileData[i][dateWithTime] = extractedData[i][8];
+//                 secondFileData[i][insertedDate] = extractedData[i][9];
+
+//                 // Fetch the Bank Name from the map based on the Handle
+//                 const handle = extractedData[i][5].toLowerCase();
+//                 if (handle && bankNameMap[handle]) {
+//                     secondFileData[i][bankNameColumnIndex] = bankNameMap[handle];
+//                 }
+
+//                 // Fetch the Origin from the map based on the Website Url
+//                 const origin = extractedData[i][2].toLowerCase();
+//                 if (origin && originOfWebsite[origin]) {
+//                     secondFileData[i][originColumnIndex] = originOfWebsite[origin];
+//                 }
+
+//                 // Fetch the Category from the map based on the Website Url
+//                 const category = extractedData[i][2].toLowerCase();
+//                 if (category && categoryOfWebsite[category]) {
+//                     secondFileData[i][categoryColumnIndex] = categoryOfWebsite[category];
+//                 }
+//             }
+
+//         }
+//     })
+//     .catch(error => {
+//         console.error('Error loading the Excel file:', error);
+//     });
