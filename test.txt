@@ -107,3 +107,17 @@
 //     .catch(error => {
 //         console.error('Error loading the Excel file:', error);
 //     });
+
+
+
+if(upiBankWalletColIndex == "UPI"){
+                    const handle = extractedData[i][5].toLowerCase();
+                    secondFileData[i][bankNameColumnIndex] = bankNameUpiMap[handle];
+                }
+                else if(upiBankWalletColIndex == "Bank Account"){
+                    const ifsc = extractedData[i][13].toLowerCase();
+                    secondFileData[i][bankNameColumnIndex] = bankNameIfscMap[ifsc];
+                }
+                else{
+                    secondFileData[i][bankNameColumnIndex] = "NA";
+                }

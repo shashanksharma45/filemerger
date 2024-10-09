@@ -1,6 +1,7 @@
 let extractedData = [];
 let secondFileData = [];
-let bankNameMap = {};
+let bankNameUpiMap = {};
+let bankNameIfscMap = {};
 let originOfWebsite = {};
 let categoryOfWebsite = {};
 let upiVpaColumnIndex = -1;
@@ -26,6 +27,7 @@ let categoryColumnIndex = -1;
 let upiUrlColumnIndex = -1;
 let upiBankWalletColIndex = -1;
 
+
 // Load the first file and extract UPI VPA, Payment Gateway URL, Handle, and Domain
 document.getElementById('uploadFirstFile').addEventListener('change', function (e) {
     const file = e.target.files[0];
@@ -39,6 +41,8 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         let jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
         jsonData = jsonData.filter(row => row.some(cell => cell !== null && cell !== ''));
 
+        const bankHeader = 'Bank Acc No';
+        const ifscHeader = 'IFSC Code';
         const upiVpaHeader = 'UPI/VPA/Wallet';
         const acHolderNameHeader = 'A/C Holder Name';
         const mfilteritScreenshotHeader = 'MFilterit_Screenshots';
@@ -48,6 +52,8 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const transactionMethodHeader = 'Method';
 
         const headerRow = jsonData[0];
+        const bankIndex = headerRow.indexOf(bankHeader);
+        const ifscIndex = headerRow.indexOf(ifscHeader);
         const upiVpaIndex = headerRow.indexOf(upiVpaHeader);
         const acHolderNameIndex = headerRow.indexOf(acHolderNameHeader);
         const mfilteritSsIndex = headerRow.indexOf(mfilteritScreenshotHeader);
@@ -56,7 +62,7 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
         const paymentGatewayUrlIndex = headerRow.indexOf(paymentGatewayUrlHeader);
         const transactionMethodIndex = headerRow.indexOf(transactionMethodHeader);
 
-        if (upiVpaIndex === -1 || paymentGatewayUrlIndex === -1 || mfilteritSsIndex === -1 || npciSsIndex === -1 || websiteUrlIndex === -1 || transactionMethodIndex === -1) {
+        if (upiVpaIndex === -1 || paymentGatewayUrlIndex === -1 || mfilteritSsIndex === -1 || npciSsIndex === -1 || websiteUrlIndex === -1 || transactionMethodIndex === -1, bankIndex === -1 || ifscIndex === -1) {
             alert('The required columns "upi_vpa", "payment_gateway_url", "bank_account_number", "ifsc_code", "ac_holder_name", "mfilterit_screenshot_url", "npci_screenshot_url", "website_url" or "transaction_method"  are missing in the first file.');
             return;
         }
@@ -66,6 +72,8 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
                 return [upiVpaHeader, paymentGatewayUrlHeader, 'Handle', 'Domain'];
             }
 
+            const bankData = row[bankIndex];
+            const ifscData = row[ifscIndex];
             const upiVpaData = row[upiVpaIndex];
             const acHolderNameData = row[acHolderNameIndex];
             const paymentGatewayData = row[paymentGatewayUrlIndex];
@@ -77,7 +85,7 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
             const DateWithTime = [];
             const insertDateData = [];
 
-            const handle = (typeof upiVpaData === 'string' && upiVpaData.includes('@')) ? upiVpaData.split('@')[1] : '';
+            const handle = (typeof upiVpaData === 'string' && upiVpaData.includes('@')) ? upiVpaData.split('@')[1] : 'NA';
             let domain = '';
             if (typeof paymentGatewayData === 'string' && paymentGatewayData.includes('://')) {
                 const domainStartIndex = paymentGatewayData.indexOf('//') + 2;
@@ -113,15 +121,17 @@ document.getElementById('uploadFirstFile').addEventListener('change', function (
             }
 
             let upiType = 'Wallet';
-            const upiVpaDataString = String(upiVpaData); 
-
+            const upiVpaDataString = String(upiVpaData);
             if (upiVpaDataString.includes('@')) {
                 upiType = 'UPI'; // If it contains '@', it's a UPI ID
             } else if (upiVpaDataString.toUpperCase() === 'NA') {
                 upiType = 'Bank Account'; // If it's 'NA', it's a Bank transaction
             }
 
-            return [upiVpaData, acHolderNameData, websiteUrlData, paymentGatewayData, transactionMethodData, handle, domain, screenshotUrl.join(','), DateWithTime, insertDateData, upiType];
+            const ifsc = ifscData.substring(0, 4);
+
+            return [upiVpaData, acHolderNameData, websiteUrlData, paymentGatewayData, transactionMethodData, handle, domain, screenshotUrl.join(','), DateWithTime, insertDateData, upiType, bankData, ifscData, ifsc];
+
         });
     };
     reader.readAsArrayBuffer(file);
@@ -150,9 +160,15 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
 
         sheet2Data.forEach(row => {
             if (row[0] && row[1]) {
-                bankNameMap[row[0].toLowerCase()] = row[1];
+                bankNameUpiMap[row[0].toLowerCase()] = row[1];
             }
         });
+
+        sheet2Data.forEach(row => {
+            if (row[2] && row[3]) {
+                bankNameIfscMap[row[2].toLowerCase()] = row[3];
+            }
+        })
 
         sheet3Data.forEach(row => {
             if (row[0] && row[1]) {
@@ -167,6 +183,7 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         })
 
         const headers = secondFileData[0];
+
         upiVpaColumnIndex = headers.indexOf('upi_vpa');
         acHolderNameColumnIndex = headers.indexOf('ac_holder_name');
         screenshotUrlColumnIndex = headers.indexOf('screenshot');
@@ -184,7 +201,8 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
         originColumnIndex = headers.indexOf('origin');
         categoryColumnIndex = headers.indexOf('category_of_website');
         upiBankWalletColIndex = headers.indexOf('upi_bank_account_wallet');
-
+        bankAccNumberColumnIndex = headers.indexOf('bank_account_number');
+        ifscCodeColumnIndex = headers.indexOf('ifsc_code');
 
         if (upiVpaColumnIndex === -1 || paymentGatewayUrlColumnIndex === -1 || handleColumnIndex === -1 || domainColumnIndex === -1 || bankNameColumnIndex === -1 || bankAccNumberColumnIndex === -1 || ifscCodeColumnIndex === -1 || acHolderNameColumnIndex === -1 || screenshotUrlColumnIndex === -1 || screenshotUrlSecColumnIndex === -1 || transactionMethodColumnIndex === -1 || upiUrlColumnIndex === -1 || websiteUrlColumnIndex === -1 || paymentGatewayIntermediateUrlColIndex === -1, dateWithTime === -1, insertedDate === -1, originColumnIndex === -1, categoryColumnIndex === -1, upiBankWalletColIndex === -1) {
             alert('The required columns "upi_vpa", "payment_gateway_url", "Handle", "Payment_gateway_name", or "Bank_name" are missing in the second file.');
@@ -219,12 +237,31 @@ document.getElementById('uploadSecondFile').addEventListener('change', function 
                 secondFileData[i][dateWithTime] = extractedData[i][8];
                 secondFileData[i][insertedDate] = extractedData[i][9];
                 secondFileData[i][upiBankWalletColIndex] = extractedData[i][10];
+                secondFileData[i][bankAccNumberColumnIndex] = extractedData[i][11];
+                secondFileData[i][ifscCodeColumnIndex] = extractedData[i][12];
 
-                // Fetch the Bank Name from the map based on the Handle
-                const handle = extractedData[i][5].toLowerCase();
-                if (handle && bankNameMap[handle]) {
-                    secondFileData[i][bankNameColumnIndex] = bankNameMap[handle];
+                // Fetch the Bank Name from the map based on Handle or IFSC Code
+                const paymentType = extractedData[i][10]; // This should contain the type (UPI, Bank Account, Wallet)
+
+                if (paymentType === 'UPI') {
+                    const handle = extractedData[i][5].toLowerCase();
+                    if (handle && bankNameUpiMap[handle]) {
+                        secondFileData[i][bankNameColumnIndex] = bankNameUpiMap[handle];
+                    } else {
+                        secondFileData[i][bankNameColumnIndex] = 'NA'; // Default if handle not found
+                    }
+                } else if (paymentType === 'Bank Account') {
+                    const ifsc = extractedData[i][13]; // Assuming the IFSC code is in the 13th column (index 12)
+                    if (ifsc && bankNameIfscMap[ifsc.toLowerCase()]) {
+                        secondFileData[i][bankNameColumnIndex] = bankNameIfscMap[ifsc.toLowerCase()];
+                    } else {
+                        secondFileData[i][bankNameColumnIndex] = 'NA'; // Default if IFSC not found
+                    }
+                } else if (paymentType === 'Wallet') {
+                    secondFileData[i][bankNameColumnIndex] = 'NA'; // Set to NA for wallets
                 }
+
+
 
                 // Fetch the Origin from the map based on the Website Url
                 const origin = extractedData[i][2].toLowerCase();
